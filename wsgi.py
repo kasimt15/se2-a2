@@ -1,69 +1,87 @@
-import click, pytest, sys
+from App.database import db
 from flask import Flask
-from flask.cli import with_appcontext, AppGroup
+from App import create_job, get_all_jobs_json, apply_to_job, get_all_applications_json
+from App.config import load_config
+from App.models import User 
+from App.controllers.initialize import initialize  
+from App.controllers.user import create_user  
+import click
+from flask.cli import AppGroup
 
-from App.database import db, get_migrate
-from App.models import User
-from App.main import create_app
-from App.controllers import ( create_user, get_all_users_json, get_all_users, initialize )
+app = Flask(__name__)
 
 
-# This commands file allow you to create convenient CLI commands for testing controllers
+load_config(app, {})
 
-app = create_app()
-migrate = get_migrate(app)
 
-# This command creates and initializes the database
+db.init_app(app)
+
+
+with app.app_context():
+    db.create_all()
+
 @app.cli.command("init", help="Creates and initializes the database")
 def init():
-    initialize()
-    print('database intialized')
+    initialize()  
+    print('database initialized')
 
-'''
-User Commands
-'''
 
-# Commands can be organized using groups
+user_cli = AppGroup('user', help='User object commands')
 
-# create a group, it would be the first argument of the comand
-# eg : flask user <command>
-user_cli = AppGroup('user', help='User object commands') 
+@user_cli.command("create", help="Create a new user")
+@click.argument("name")
+@click.argument("password")
+@click.argument("email")
+@click.argument("phone")
+def create_user_command(name, password, email, phone):
+    with app.app_context():
+        # Check if user already exists
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            print(f'User with email {email} already exists.')
+            return
 
-# Then define the command and any parameters and annotate it with the group (@)
-@user_cli.command("create", help="Creates a user")
-@click.argument("username", default="rob")
-@click.argument("password", default="robpass")
-def create_user_command(username, password):
-    create_user(username, password)
-    print(f'{username} created!')
-
-# this command will be : flask user create bob bobpass
-
-@user_cli.command("list", help="Lists users in the database")
-@click.argument("format", default="string")
-def list_user_command(format):
-    if format == 'string':
-        print(get_all_users())
-    else:
-        print(get_all_users_json())
-
-app.cli.add_command(user_cli) # add the group to the cli
-
-'''
-Test Commands
-'''
-
-test = AppGroup('test', help='Testing commands') 
-
-@test.command("user", help="Run User tests")
-@click.argument("type", default="all")
-def user_tests_command(type):
-    if type == "unit":
-        sys.exit(pytest.main(["-k", "UserUnitTests"]))
-    elif type == "int":
-        sys.exit(pytest.main(["-k", "UserIntegrationTests"]))
-    else:
-        sys.exit(pytest.main(["-k", "App"]))
+        new_user = create_user(name, password, email, phone)
+        
+        print(f'User {name} created with ID {new_user.id}.')
     
 
-app.cli.add_command(test)
+app.cli.add_command(user_cli)
+
+
+job_cli = AppGroup('job', help='Job object commands')
+
+@job_cli.command("create", help="Create a new job")
+@click.argument("title")
+@click.argument("description")
+@click.argument("company")
+def create_job_command(title, description, company):
+    create_job(title, description, company)
+    print(f'Job {title} created.')
+
+@job_cli.command("list", help="List all jobs")
+def list_jobs_command():
+    jobs = get_all_jobs_json()
+    print(jobs)
+
+app.cli.add_command(job_cli)
+
+application_cli = AppGroup('application', help='Application object commands')
+
+@application_cli.command("apply", help="Apply to a job")
+@click.argument("user_id")
+@click.argument("job_id")
+def apply_to_job_command(user_id, job_id,):
+    apply_to_job(user_id, job_id)
+    print(f'Application created for user {user_id} on job {job_id}.')
+
+@application_cli.command("list", help="List all applicants for a job")
+@click.argument("job_id")
+def list_applications_command(job_id):
+    applications = get_all_applications_json(job_id)
+    print(applications)
+
+app.cli.add_command(application_cli)
+
+if __name__ == "__main__":
+    app.run()

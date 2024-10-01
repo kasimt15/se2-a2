@@ -1,9 +1,9 @@
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/Ishmaelju/flaskmvc)
-<a href="https://render.com/deploy?repo=https://github.com/Ishmaelju/flaskmvc">
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/uwidcit/flaskmvc)
+<a href="https://render.com/deploy?repo=https://github.com/uwidcit/flaskmvc">
   <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render">
 </a>
 
-![Tests](https://github.com/IshmaelJu/flaskmvc/actions/workflows/dev.yml/badge.svg)
+![Tests](https://github.com/uwidcit/flaskmvc/actions/workflows/dev.yml/badge.svg)
 
 # Flask MVC Template
 A template for flask applications structured in the Model View Controller pattern [Demo](https://dcit-flaskmvc.herokuapp.com/). [Postman Collection](https://documenter.getpostman.com/view/583570/2s83zcTnEJ)
@@ -86,6 +86,23 @@ Then execute the command invoking with flask cli with command name and the relev
 $ flask user create bob bobpass
 ```
 
+Here are my cli commands:
+
+flask init - This would initalize the datebase dropping all data from before (no agruments)
+
+flask user create - This would allow for users who wish to apply to jobs to create an account that is associated with an id
+Eg flask user create john_Doe pass john_Doe@gmail.com 1868-123-4567
+
+flask job create - This allows for persons to post jobs 
+Eg flask job create software_engineering build_software tech_company
+
+flask job list - This allows for all the jobs that were posted to be displayed (no agruments)
+
+flask application apply - This allows for a user to apply to a job, the user must use their id and the id of the job that they wish to apply to.
+Eg flask application apply 2 1 (where 2 is the user id and 1 is the job id)
+
+flask application list - This displays all the users who applied to a particular job, the id for the job must be used.
+Eg flask application list 1 (where 1 is the job id)
 
 # Running the Project
 
@@ -94,13 +111,13 @@ _For development run the serve command (what you execute):_
 $ flask run
 ```
 
-_For production using gunicorn (what heroku executes):_
+_For production using gunicorn (what the production server executes):_
 ```bash
 $ gunicorn wsgi:app
 ```
 
 # Deploying
-You can deploy your version of this app to heroku by clicking on the "Deploy to heroku" link above.
+You can deploy your version of this app to render by clicking on the "Deploy to Render" link above.
 
 # Initializing the Database
 When connecting the project to a fresh empty database ensure the appropriate configuration is set then file then run the following command. This must also be executed once when running the app on heroku by opening the heroku console, executing bash and running the command in the dyno.
