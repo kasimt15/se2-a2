@@ -1,21 +1,12 @@
+from App.main import create_app
 from App.database import db
-from flask import Flask
-from App import create_job, get_all_jobs_json, apply_to_job, get_all_applications_json
-from App.config import load_config
-from App.models import User 
-from App.controllers.initialize import initialize  
-from App.controllers.user import create_user  
+from App.models import User
+from App import create_job, get_all_jobs_json, apply_to_job, get_all_applications_json, get_all_users_json, create_user
+from App.controllers.initialize import initialize
 import click
 from flask.cli import AppGroup
 
-app = Flask(__name__)
-
-
-load_config(app, {})
-
-
-db.init_app(app)
-
+app = create_app()
 
 with app.app_context():
     db.create_all()
@@ -25,7 +16,7 @@ def init():
     initialize()  
     print('database initialized')
 
-
+# CLI commands for user
 user_cli = AppGroup('user', help='User object commands')
 
 @user_cli.command("create", help="Create a new user")
@@ -35,20 +26,22 @@ user_cli = AppGroup('user', help='User object commands')
 @click.argument("phone")
 def create_user_command(name, password, email, phone):
     with app.app_context():
-        # Check if user already exists
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
             print(f'User with email {email} already exists.')
             return
 
         new_user = create_user(name, password, email, phone)
-        
         print(f'User {name} created with ID {new_user.id}.')
-    
+
+@user_cli.command("list", help="Return JSON of all users")
+def get_all_users_json_command():
+    users = get_all_users_json()
+    print(users)
 
 app.cli.add_command(user_cli)
 
-
+# CLI commands for job
 job_cli = AppGroup('job', help='Job object commands')
 
 @job_cli.command("create", help="Create a new job")
@@ -66,12 +59,13 @@ def list_jobs_command():
 
 app.cli.add_command(job_cli)
 
+# CLI commands for applications
 application_cli = AppGroup('application', help='Application object commands')
 
 @application_cli.command("apply", help="Apply to a job")
 @click.argument("user_id")
 @click.argument("job_id")
-def apply_to_job_command(user_id, job_id,):
+def apply_to_job_command(user_id, job_id):
     apply_to_job(user_id, job_id)
     print(f'Application created for user {user_id} on job {job_id}.')
 
@@ -84,4 +78,4 @@ def list_applications_command(job_id):
 app.cli.add_command(application_cli)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
