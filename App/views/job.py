@@ -15,3 +15,15 @@ def create_job_api():
 def get_jobs_api():
     jobs= get_all_jobs()
     return jsonify([{'id': job.id, 'title': job.title, 'company': job.company} for job in jobs]), 200
+
+@job_views.route('/api/job/<int:id>', methods=['GET'])
+def get_job_api(id):
+    job = get_job(id)
+    if not job:
+        return jsonify({'message': 'Job not found'}), 404
+    return jsonify({
+        'id': job.id,
+        'title': job.title,
+        'description': job.description,
+        'company': job.company
+    })
