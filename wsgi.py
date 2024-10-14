@@ -11,7 +11,7 @@ app = create_app()
 with app.app_context():
     db.create_all()
 
-@app.cli.command("init", help="Creates and initializes the database")
+@app.cli.command("init1", help="Creates and initializes the database")
 def init():
     initialize()  
     print('database initialized')
