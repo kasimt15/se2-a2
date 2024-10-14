@@ -6,16 +6,21 @@ class Job(db.Model):
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(500), nullable=False)
     company = db.Column(db.String(100), nullable=False)
+    employer_id= db.Column(db.Integer, db.ForeignKey('User.id'), nullable= False)
 
-    def __init__(self, title, description, company):
+    employer = db.relationship('User', backref='jobs')
+    
+    def __init__(self, title, description, company, employer_id):
         self.title = title
         self.description = description
         self.company = company
+        self.employer_id= employer_id
 
     def get_json(self):
         return {
             'id': self.id,
             'title': self.title,
             'description': self.description,
-            'company': self.company
+            'company': self.company,
+            'employer': self.employer
         }

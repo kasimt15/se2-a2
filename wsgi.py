@@ -48,8 +48,9 @@ job_cli = AppGroup('job', help='Job object commands')
 @click.argument("title")
 @click.argument("description")
 @click.argument("company")
-def create_job_command(title, description, company):
-    create_job(title, description, company)
+@click.argument("employer")
+def create_job_command(title, description, company, employer):
+    create_job(title, description, company, employer)
     print(f'Job {title} created.')
 
 @job_cli.command("list", help="List all jobs")

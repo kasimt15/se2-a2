@@ -1,23 +1,18 @@
-from flask import Blueprint, make_response, render_template, jsonify, request, flash, send_from_directory, flash, redirect, url_for
-from flask_jwt_extended import jwt_required, current_user, unset_jwt_cookies, set_access_cookies
+from flask import Blueprint, make_response, render_template, jsonify, request, flash, redirect, url_for
+from flask_jwt_extended import jwt_required, current_user, unset_jwt_cookies
 from App.controllers.user import get_all_users
+from App.controllers.auth import role_required
 
-
-from.index import index_views
-
-from App.controllers import (
-    login
-)
+from App.controllers import login
 
 auth_views = Blueprint('auth_views', __name__, template_folder='../templates')
-
-
-
 
 '''
 Page/Action Routes
 '''    
 @auth_views.route('/users', methods=['GET'])
+@jwt_required()
+@role_required('admin')
 def get_user_page():
     users = get_all_users()
     return render_template('users.html', users=users)
@@ -37,7 +32,6 @@ def login_action():
         flash('Bad name or password given'), 401
     else:
         flash('Login Successful')
-        set_access_cookies(response, token) 
     return response
 
 @auth_views.route('/logout', methods=['GET'])
@@ -53,20 +47,20 @@ API Routes
 
 @auth_views.route('/api/login', methods=['POST'])
 def user_login_api():
-    data= request.json
+    data = request.json
     if not data or 'name' not in data or 'password' not in data:
         return jsonify(message="Invalid input"), 400
     
-    token= login(data['name'], data['password'])
+    token = login(data['name'], data['password'])
 
     if not token:
-        return jsonify(message= 'Invalid name or password'), 401
-    return jsonify(access_token= token)
+        return jsonify(message='Invalid name or password'), 401
+    return jsonify(access_token=token)
 
 @auth_views.route('/api/identify', methods=['GET'])
 @jwt_required()
 def identify_user():
-    return jsonify({'message': f"name: {current_user.name}, id : {current_user.id}"})
+    return jsonify({'message': f"name: {current_user.name}, id : {current_user.id}, role: {current_user.role}"})
 
 @auth_views.route('/api/logout', methods=['GET'])
 def logout_api():
