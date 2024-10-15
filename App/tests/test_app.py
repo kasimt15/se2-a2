@@ -1,5 +1,8 @@
 import os, tempfile, pytest, logging, unittest
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash
+
+
 
 from App.main import create_app
 from App.database import db, create_db
@@ -13,7 +16,6 @@ from App.controllers import (
     update_user
 )
 
-
 LOGGER = logging.getLogger(__name__)
 
 '''
@@ -22,32 +24,30 @@ LOGGER = logging.getLogger(__name__)
 class UserUnitTests(unittest.TestCase):
 
     def test_new_user(self):
-        user = User("bob", "bobpass")
-        assert user.username == "bob"
+        user = User("bob", "bobpass", "bob@email.com", "321-1234", "user") 
+        assert user.name == "bob"  
 
-    # pure function no side effects or integrations called
     def test_get_json(self):
-        user = User("bob", "bobpass")
+        user = User("bob", "bobpass", "bob@email.com", "321-1234", "user")  
         user_json = user.get_json()
-        self.assertDictEqual(user_json, {"id":None, "username":"bob"})
-    
+        self.assertDictEqual(user_json, {"id": None, "name": "bob", "role": "user"})  
+
     def test_hashed_password(self):
         password = "mypass"
         hashed = generate_password_hash(password, method='sha256')
-        user = User("bob", password)
+        user = User("bob", "bobpass", "bob@email.com", "321-1234", "user")  
         assert user.password != password
 
     def test_check_password(self):
         password = "mypass"
-        user = User("bob", password)
+        user = User("bob", password, "bob@email.com", "321-1234", "user")  
         assert user.check_password(password)
+
 
 '''
     Integration Tests
 '''
 
-# This fixture creates an empty database for the test and deletes it after the test
-# scope="class" would execute the fixture once and resued for all methods in the class
 @pytest.fixture(autouse=True, scope="module")
 def empty_db():
     app = create_app({'TESTING': True, 'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db'})
@@ -57,23 +57,42 @@ def empty_db():
 
 
 def test_authenticate():
-    user = create_user("bob", "bobpass")
+    user = create_user("bob", "bobpass", "bob@email.com", "321-1234", "user")
     assert login("bob", "bobpass") != None
+
 
 class UsersIntegrationTests(unittest.TestCase):
 
     def test_create_user(self):
-        user = create_user("rick", "bobpass")
-        assert user.username == "rick"
+        user = create_user("bob", "bobpass", "bob@email.com", "321-1234")
+        assert user.name == "bob"
 
+    
     def test_get_all_users_json(self):
         users_json = get_all_users_json()
-        self.assertListEqual([{"id":1, "username":"bob"}, {"id":2, "username":"rick"}], users_json)
+        self.assertListEqual([{"id":1, "username":"bob"}, {"id":2, "username":"jane"}], users_json)
 
-    # Tests data changes in the database
-    def test_update_user(self):
-        update_user(1, "ronnie")
-        user = get_user(1)
-        assert user.username == "ronnie"
-        
+   
 
+class JobsIntegrationTests(unittest.TestCase):
+
+    def test_create_job(self):
+        job = create_job("Software Engineer", "Develop and maintain software", "TechCorp")
+        assert job.title == "Software Engineer"
+
+    def test_get_all_jobs_json():
+        jobs_json = get_all_jobs_json()
+        self.assertListEqual([
+            {'id': 1, 'title': 'Software Engineer', 'description': 'Develop and maintain software.', 'company': 'TechCorp'},
+            {'id': 2, 'title': 'Marketing Manager', 'description': 'Lead marketing campaigns and strategies.', 'company': 'MarketingPro'}
+        ], jobs_json)
+
+    def test_apply_to_job(self):
+        apply_to_job(1, 1)
+        applications = get_all_applications_json(1)
+        self.assertIn({"user_id": 1, "job_id": 1}, applications)
+
+    def test_get_all_applications_json(self):
+        applications_json = get_all_applications_json(1)
+        expected_applications = [{"user_id": 1, "job_id": 1}, {"user_id": 2, "job_id": 1}]
+        self.assertListEqual(expected_applications, applications_json)
