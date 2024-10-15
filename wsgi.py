@@ -14,7 +14,7 @@ with app.app_context():
 @app.cli.command("init", help="Creates and initializes the database")
 def init():
     initialize()  
-    print('database initialized')
+    print('Database initialized')
 
 # CLI commands for user
 user_cli = AppGroup('user', help='User object commands')
