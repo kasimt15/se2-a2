@@ -9,6 +9,8 @@ def login(name, password):
         token = create_access_token(identity=user.id, additional_claims={"role": user.role})
         return token
     return None
+    
+    
 
 def setup_jwt(app):
     jwt = JWTManager(app)

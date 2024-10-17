@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, current_user, unset_jwt_cookies
 from App.controllers.user import get_all_users
 from App.controllers.auth import role_required
 
-from App.controllers import login
+from App.controllers import login, create_user
 
 auth_views = Blueprint('auth_views', __name__, template_folder='../templates')
 
@@ -44,6 +44,18 @@ def logout_action():
 '''
 API Routes
 '''
+
+@auth_views.route('/api/register', methods= ['POST'])
+def user_register_api():
+    data= request.json
+    if not data or 'name' not in data or 'password' not in data or 'role' not in data:
+        return jsonify(message="Invalid input"), 400
+    try:
+        new_user = create_user(data['name'], data['password'], data["email"], data['phone'], data['role'])
+    except Exception as e:
+        return jsonify(message="An error occurred while creating the user"), 500
+    return jsonify({"message": f"id: {new_user.id}, name: {new_user.name} was created"}), 201
+    
 
 @auth_views.route('/api/login', methods=['POST'])
 def user_login_api():
