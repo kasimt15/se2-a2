@@ -14,7 +14,12 @@ def get_all_jobs():
     return Job.query.all()
 
 def get_all_jobs_json():
-    jobs = Job.query.all()
-    if not jobs:
-        return []
-    return [job.get_json() for job in jobs]
+    jobs = Job.query.all()  # Get all jobs from the database
+    return [{
+        'id': job.id,
+        'title': job.title,
+        'description': job.description,
+        'company': job.company,
+        'employer': job.employer.id  # Ensure it returns the employer's ID
+    } for job in jobs]
+

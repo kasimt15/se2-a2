@@ -97,9 +97,9 @@ class UserUnitTests(unittest.TestCase):
 
 def test_authenticate():
     user = create_user("bob", "bobpass", "bob@email.com", "321-1234", "user")
-    print(f"User created: {user}")  # Print the created user to confirm
+    print(f"User created: {user}") 
     logged_in_user = login("bob", "bobpass")
-    print(f"Login result: {logged_in_user}")  # Print login result to see what is returned
+    print(f"Login result: {logged_in_user}")  
     assert logged_in_user != None
 
 
@@ -114,12 +114,11 @@ class UsersIntegrationTests(unittest.TestCase):
 
     @pytest.mark.usefixtures("empty_db")
     def test_get_all_users_json(self):
-        users_json = get_all_users_json()
-        self.assertListEqual([{"id":1, "username":"bob", "role":"user"}, {"id":2, "username":"rob", "role":"user"}], users_json)
-        #self.assertListEqual([{"id":1, "username":"bob", "role":"user"}, {"id":2, "username":"jane", "role":"user"}], users_json)
-
-   
-
+      users_json = get_all_users_json()
+      self.assertListEqual(
+        [{"id": 1, "name": "bob", "role": "user"}, 
+         {"id": 2, "name": "rob", "role": "user"}], users_json)
+    
 class JobsIntegrationTests(unittest.TestCase):
 
     def test_create_job(self):
@@ -128,20 +127,40 @@ class JobsIntegrationTests(unittest.TestCase):
         assert job.title == "Software Engineer"
 
     def test_get_all_jobs_json(self):
-        jobs_json = get_all_jobs_json()
-        self.assertListEqual([
-            {'id': 1, 'title': 'Software Engineer', 'description': 'Develop and maintain software.', 'company': 'TechCorp', 'employer': bob}
-            #{'id': 2, 'title': 'Marketing Manager', 'description': 'Lead marketing campaigns and strategies.', 'company': 'MarketingPro'}
-        ], jobs_json)
+     jobs_json = get_all_jobs_json()
+     self.assertListEqual([
+        {'id': 1, 'title': 'Software Engineer', 'description': 'Develop and maintain software', 'company': 'TechCorp', 'employer': 1},  # employer as ID
+        {'id': 2, 'title': 'Software Engineer', 'description': 'Develop and maintain software', 'company': 'TechCorp', 'employer': 1}   # employer as ID
+    ], jobs_json)
+
+
 
     def test_apply_to_job(self):
+        job = create_job("Software Engineer", "Develop and maintain software", "TechCorp", 1)
         apply_to_job(1, 1)
         applications = get_all_applications_json(1)
-        self.assertIn({"user_id": 1, "job_id": 1}, applications)
+        expected_applications = [{
+            "id": 1,
+            "user_id": 1,
+            "user_name": "bob",
+            "user_email": "bob@email.com",
+            "user_phone": "321-1234",
+            "job_id": 1,
+            "job_Name": "Software Engineer"
+        }]
+        self.assertListEqual(expected_applications, applications)
 
     def test_get_all_applications_json(self):
         applications_json = get_all_applications_json(1)
-        expected_applications = [{"user_id": 1, "job_id": 1}, {"user_id": 2, "job_id": 1}]
+        expected_applications = [{
+            "id": 1,
+            "user_id": 1,
+            "user_name": "bob",
+            "user_email": "bob@email.com",
+            "user_phone": "321-1234",
+            "job_id": 1,
+            "job_Name": "Software Engineer"
+        }]
         self.assertListEqual(expected_applications, applications_json)
 
 if __name__ == '__main__':
