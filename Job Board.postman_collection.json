@@ -1,0 +1,396 @@
+{
+	"info": {
+		"_postman_id": "1dbeaf34-c415-466f-bf01-dd62b5225a76",
+		"name": "Job Board",
+		"description": "a collection of endpoint for creating users with specific roles, creating jobs, viewing and applying for jobs.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20571180"
+	},
+	"item": [
+		{
+			"name": "/api/login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains access token\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"access_token\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyODkxMjUyOSwianRpIjoiODgyNGVhNDAtMDBiMC00OWY3LTkzMTYtYWUwODRmYTczYjVlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MiwibmJmIjoxNzI4OTEyNTI5LCJleHAiOjE3Mjg5MTM0MjksInJvbGUiOiJ1c2VyIn0.GwmE5ov5joNHOSF0v9afFZ8OVXzRa15wXjYNyndT2i0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"bob\",\r\n    \"password\": \"bobpass\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Development}}/api/login",
+					"host": [
+						"{{Development}}"
+					],
+					"path": [
+						"api",
+						"login"
+					]
+				},
+				"description": "This is used to login into your account, in the body->JSON, input your and name and password"
+			},
+			"response": []
+		},
+		{
+			"name": "/api/identify",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains user information\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include(\"name\");\r",
+							"    pm.expect(jsonData.message).to.include(\"id\");\r",
+							"    pm.expect(jsonData.message).to.include(\"role\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyOTMwMTY2NiwianRpIjoiMGI5NGYxYmMtNzhjZi00YTFmLTk3MDQtOWYwOWIxZWRjNDcyIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNzI5MzAxNjY2LCJleHAiOjE3MjkzMDI1NjYsInJvbGUiOiJlbXBsb3llciJ9.OaaeGeUi12_OsiPNgVPNk4XcBNg0OudTXEoCgW2bN8A",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Development}}/api/identify",
+					"host": [
+						"{{Development}}"
+					],
+					"path": [
+						"api",
+						"identify"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains logout message\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"message\");\r",
+							"    pm.expect(jsonData.message).to.equal(\"Logged Out!\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Development}}/api/logout",
+					"host": [
+						"{{Development}}"
+					],
+					"path": [
+						"api",
+						"logout"
+					]
+				},
+				"description": "simply logs out the user"
+			},
+			"response": []
+		},
+		{
+			"name": "/api/register",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has the correct message\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"message\");\r",
+							"    pm.expect(jsonData.message).to.include(\"was created\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"kasim\",\r\n    \"password\": \"kasimpass\",\r\n    \"email\": \"kasim@example.com\",\r\n    \"phone\": 123456789,\r\n    \"role\": \"employer\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Development}}/api/register",
+					"host": [
+						"{{Development}}"
+					],
+					"path": [
+						"api",
+						"register"
+					]
+				},
+				"description": "it registers a new user which the person's name, password, email, phone number and role where you are expected to choose two case sensitive options, \"employer\" and \"user\"."
+			},
+			"response": []
+		},
+		{
+			"name": "/api/view_jobs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains a list of jobs\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an('array');\r",
+							"    pm.expect(jsonData[0]).to.have.property(\"title\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Development}}/api/view_jobs",
+					"host": [
+						"{{Development}}"
+					],
+					"path": [
+						"api",
+						"view_jobs"
+					]
+				},
+				"description": "shows all available jobs to apply for"
+			},
+			"response": []
+		},
+		{
+			"name": "/api/create_job",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains job creation message\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"job_id\");\r",
+							"    pm.expect(jsonData.message).to.equal(\"job was created\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTcyOTMwMjM5OCwianRpIjoiNjMyYjE0YTMtZjBiNS00ODYyLTgxZjYtMDNmMzVhNGNmM2RkIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNzI5MzAyMzk4LCJleHAiOjE3MjkzMDMyOTgsInJvbGUiOiJlbXBsb3llciJ9._YvGQMftNW8Xln0PjTl6zWvpgXHBUp2xRg6egL9E4Dc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"drain cleaner\",\r\n    \"description\": \"cleaning the people drains\",\r\n    \"company\": \"cepep\",\r\n    \"employer\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Development}}/api/create_job",
+					"host": [
+						"{{Development}}"
+					],
+					"path": [
+						"api",
+						"create_job"
+					]
+				},
+				"description": "this take the access token and depending on what role it is, will create a job with a jib title, description of the job, campany advertising the job, and the person that posted the job."
+			},
+			"response": []
+		},
+		{
+			"name": "/api/{{job_id}}/apply_to_job",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains application id\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"application_id\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user_id\": 3\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Development}}/api/{{job_id}}/apply_to_job",
+					"host": [
+						"{{Development}}"
+					],
+					"path": [
+						"api",
+						"{{job_id}}",
+						"apply_to_job"
+					]
+				},
+				"description": "this uses a variable in the endpoint which contains the job id of the job you'd like to apply to, and the body would be the user id of the person applying to a job"
+			},
+			"response": []
+		},
+		{
+			"name": "/api/{{job_id}}/applications",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains a list of applications\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an('array');\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{Development}}/api/{{job_id}}/applications",
+					"host": [
+						"{{Development}}"
+					],
+					"path": [
+						"api",
+						"{{job_id}}",
+						"applications"
+					]
+				},
+				"description": "this uses a variable in the endpoint which contains the job that you wanna view the applications of, and displays it."
+			},
+			"response": []
+		}
+	]
+}
