@@ -74,26 +74,6 @@ class UserUnitTests(unittest.TestCase):
 
 
 
-# @pytest.fixture(autouse=True, scope="module")
-# def empty_db():
-#     app = create_app({'TESTING': True, 'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db'})
-#     create_db()
-#     yield 
-#     app.test_client()
-#     db.drop_all()
-  
-# @pytest.fixture(autouse=True, scope="module")
-# def empty_db():
-#     # Set up the Flask application for testing
-#     app = create_app({'TESTING': True, 'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db'})
-    
-#     # Activate application context for the fixture
-#     with app.app_context():
-#         db.create_all()  # Create all database tables before running tests
-#         yield app.test_client()  # Provide a test client to use in the tests
-        
-#         # Cleanup after tests run
-#         db.drop_all()  # Drop all tables after the tests complete
 
 def test_authenticate():
     user = create_user("bob", "bobpass", "bob@email.com", "321-1234", "user")
@@ -105,9 +85,6 @@ def test_authenticate():
 
 class UsersIntegrationTests(unittest.TestCase):
     
-
-    
-    #@pytest.mark.usefixtures("empty_db")
     def test_create_user(self):
         user = create_user("rob", "robpass", "robbie@email.com", "321-1222", "user")
         assert user.name == "rob"
